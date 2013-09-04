@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import re
+import sys
+
+import sims3.sims3pack.xmlreader as s3pack
+
+def get_package_data(filename, args=None):
+    return s3pack.Sims3Pack(filename)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Get The Sims 3 .package information')
+    parser.add_argument('package_filenames', metavar='PACKAGE_FILE',
+                        nargs='+', help='.package files to process')
+
+    args = parser.parse_args()
+    failed = False
+
+    for package_filename in args.package_filenames:
+        try:
+            with open(package_filename, 'rb') as f:
+                print('%s\n' % get_package_data(f))
+        except (IOError, s3pack.Sims3PackError) as e:
+            print('File "%s" is not valid (%s)' % (package_filename, e), file=sys.stderr)
+            failed = True
+
+    if failed:
+        sys.exit(1)
